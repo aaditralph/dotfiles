@@ -1,0 +1,13 @@
+# Deep blackish-blue background
+background = "#0f1219" 
+
+# Slightly lighter, but still dark blue for panels/highlights
+accent_primary = "#1e2433" 
+accent_secondary = "#2a3247" 
+
+# Text color (off-white for readability)
+foreground = "#d1d5db"
+
+# Keep the border/accent colors dark
+destructive = "#7f1d1d" 
+opacity = 0.96

@@ -1,0 +1,130 @@
+/* JetBrainsMono Nerd Font is required for icons */
+* {
+    font-family: "JetBrainsMono Nerd Font", "Roboto", sans-serif;
+    font-size: 14px;
+    border: none;
+    border-radius: 0;
+}
+
+window#waybar {
+    background-color: transparent;
+}
+
+/* Base style for all Pills */
+#custom-launcher,
+#clock,
+#window,
+#temperature,
+#workspaces,
+#network,
+#pulseaudio,
+#custom-notification {
+    background-color: #1e2326; /* Everforest Dark */
+    color: #dbbc7f; /* Everforest Peach */
+    padding: 2px 15px;
+    border-radius: 20px;
+    margin: 4px 0;
+}
+#battery {
+    background-color: #1e2326; /* Everforest Dark */
+    color: #dbbc7f; /* Everforest Peach */
+    padding: 2px 15px;
+    border-radius: 20px;
+    margin: 4px 0;
+    /*word-spacing: -2px;*/
+}
+#tray {
+    padding: 1px 2px;
+    border-radius: 10px;
+    margin: 2px 0;
+}
+
+/* Left Section Colors */
+#custom-launcher {
+    color: #a7c080; /* Green */
+    padding-right: 20px;
+}
+
+#clock {
+    color: #83c092; /* Aqua */
+}
+
+#temperature {
+    color: #e67e80; /* Red/Pink */
+}
+
+/* Center Section - Dynamic Workspace Pill */
+#workspaces {
+    background-color: #1e2326;
+    margin: 5px 0;
+    padding: 0 5px;
+    border-radius: 20px;
+}
+
+#workspaces button {
+    /* This adds space between the numbers */
+    padding: 0 10px;
+    color: #dbbc7f; /* Everforest Peach */
+    background: transparent;
+    /* Using a fixed font weight keeps the pill size stable */
+    font-weight: bold;
+    transition: all 0.3s ease-in-out;
+}
+
+#workspaces button.active {
+    color: #a7c080; /* Everforest Green for the current number */
+    background: linear-gradient(180deg, #2d353b 0%, #1e2326 100%);
+    border-radius: 20px;
+    min-width: 30px;
+    transition: all 0.3s ease-in-out;
+}
+
+#workspaces button.urgent {
+    color: #e67e80; /* Red for urgent */
+}
+
+#workspaces button:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 15px;
+}
+
+/* Right Section Colors */
+#tray {
+    margin-right: 3px;
+}
+
+#pulseaudio {
+    color: #d699b6; /* Purple */
+}
+
+#network {
+    color: #7fbbb3; /* Blue */
+}
+
+#battery {
+    color: #a7c080;
+}
+
+#battery.warning {
+    color: #dbbc7f;
+}
+
+#battery.critical {
+    color: #e67e80;
+}
+
+#custom-notification {
+    color: #dbbc7f;
+}
+#custom-power {
+    background-color: #e67e80; /* Everforest red */
+    color: #1e2326;
+    padding: 2px 16px;
+    border-radius: 20px;
+    margin: 4px 0 4px 8px;
+    font-size: 16px;
+}
+
+#custom-power:hover {
+    background-color: #dbbc7f;
+}

@@ -1,0 +1,31 @@
+/* Deepen the main container */
+.orbit-panel {
+    background-color: #0f1219;
+    border: 1px solid #2a3247;
+}
+
+/* Make the network rows match the deep background */
+.orbit-network-row {
+    background: #161b26;
+    border: 1px solid #252d3f;
+}
+
+/* Style the buttons to look like your Waybar pill buttons */
+button, .orbit-button {
+    background: #252d3f;
+    color: #e5e7eb;
+    border-radius: 20px;
+    border: 1px solid #374151;
+}
+
+/* Hover state for that nice 'black-blue' interaction */
+button:hover {
+    background: #313e57;
+}
+
+/* Ensure the search bar matches */
+entry {
+    background: #161b26;
+    border: 1px solid #2a3247;
+    color: #ffffff;
+}

@@ -1,0 +1,125 @@
+/*
+All modules or parts I would want:
+Left side:
+OS Icon for launcher
+CPU + done
+RAM Monitors done
+system tray done
+
+Center:
+Current window name
+Workspaces navigator and identifier done
+Clock done
+
+Right:
+Volume(Speaker Controls as well) done
+Wifi(+Bluetooth on click) done
+Battery done
+Notification
+
+*/
+{
+  "height": 42, // Waybar height (to be removed for auto height)
+  "spacing": 8, // Gaps between modules (4px)
+  "modules-center": ["hyprland/window", "hyprland/workspaces", "clock"],
+  "modules-left": ["custom/launcher", "cpu", "memory", "tray"],
+  "modules-right": ["pulseaudio", "network", "battery", "custom/notification"],
+  "tray": {
+    "icon-size": 21,
+    "spacing": 10,
+  },
+  "clock": {
+    // "timezone": "America/New_York",
+    "tooltip-format": "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>",
+    "format": "{:%I:%M %p}",
+  },
+  "cpu": {
+    "format": "{usage}% ",
+    "tooltip": false,
+  },
+  "memory": {
+    "format": "{}% ",
+  },
+  "battery": {
+    "states": {
+      // "good": 95,
+      "warning": 30,
+      "critical": 15,
+    },
+    "format": "{capacity}% {icon} ",
+    "format-charging": "{capacity}% 󰂄",
+    "format-plugged": "{capacity}% ",
+    // "format-good": "", // An empty format will hide the module
+    // "format-full": "",
+    "format-icons": ["", "", "", "", ""],
+  },
+
+
+
+  "network": {
+    // "interface": "wlp2*", // (Optional) To force the use of this interface
+    "format-wifi": "{essid} ({signalStrength}%)  ",
+    "format-ethernet": "{ipaddr}/{cidr} ",
+    "format-linked": "{ifname} (No IP) ",
+    "format-disconnected": "Disconnected ⚠",
+    "on-click": "orbit toggle top-right",
+  },
+  "pulseaudio": {
+    // "scroll-step": 1, // %, can be a float
+    "format": "{volume}% {icon}",
+    "format-bluetooth": "{volume}% ",
+    "format-bluetooth-muted": "󰝟 ",
+    "format-muted": "󰝟",
+    "format-icons": {
+      "headphone": "",
+      "hands-free": "",
+      "headset": "",
+      "phone": "",
+      "portable": "",
+      "car": "",
+      "default": ["", "", ""],
+    },
+    "on-click": "pavucontrol",
+  },
+  "hyprland/window": {
+    "format": "{}",
+    "rewrite": {
+      "(.*) - Vivaldi": "Vivaldi",
+      "(.*) — Vivaldi": "Vivaldi",
+      "Vivaldi": "Vivaldi",
+      "(.*) - Alacritty": "Alacritty",
+      "Alacritty": "Alacritty",
+      "(.*) - Zed": "Zed",
+      "(.*) — Zed": "Zed",
+      "Zed": "Zed",
+      "(.*) - Goofcord": "Goofcord",
+      "Goofcord": "Goofcord",
+      "(.*) - Mozilla Firefox": "Firefox",
+      "(.*) — Mozilla Firefox": "Firefox",
+      "(.*) - (.*)": "$2",
+      "(.*) — (.*)": "$2",
+      "(.*) \\| (.*)": "$2",
+      "(.*)": " $1",
+    },
+    "icon": true,
+    "icon-size": 26,
+    "separate-outputs": true,
+  },
+  "custom/notification": {
+    "format": "{icon}",
+    "format-icons": {
+      "default": "",
+    },
+    "on-click": "swaync-client -t -sw",
+  },
+  "custom/launcher": {
+    "format": "{icon}",
+    "format-icons": {
+      "default": "",
+    },
+    "on-click": "rofi -show drun",
+  },
+  "hyprland/workspaces": {
+    "format": "{name}",
+  },
+}
