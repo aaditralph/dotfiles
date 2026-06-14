@@ -1,12 +1,11 @@
 * {
-    /* `otf-font-awesome` is required to be installed for icons */
-    font-family: "SF Pro Text", sans-serif;
+    font-family: "SF Pro Text", "JetBrainsMono Nerd Font", sans-serif;
     font-size: 13px;
 }
 
 window#waybar {
-    background-color: rgba(30, 35, 38, 0);
-    color: #a9b1d6;
+    background-color: rgba(0, 0, 0, 0);
+    color: #c0caf5;
     transition-property: background-color;
     transition-duration: 0.5s;
 }
@@ -25,15 +24,12 @@ window#waybar.chromium {
 }
 
 button {
-    /* Use box-shadow instead of border so the text isn't offset */
     box-shadow: inset 0 -1px transparent;
-    color: #ffffff;
-    /* Avoid rounded borders under each button name */
+    color: #c0caf5;
     border: none;
     border-radius: 0;
 }
 
-/* https://github.com/Alexays/Waybar/wiki/FAQ#the-workspace-buttons-have-a-strange-hover-effect */
 button:hover {
     background: inherit;
     box-shadow: inset 0 -1px #7aa2f7;
@@ -51,73 +47,88 @@ button:hover {
 #pulseaudio,
 #wireplumber,
 #tray {
-    /* Keep structure, change color to a blueish translucent base */
-    background:
-        linear-gradient(
-            180deg,
-            rgba(255, 255, 255, 0.12) 0%,
-            rgba(255, 255, 255, 0) 50%
-        ),
-        /* NEW: Changed grayish base to a blueish-infused dark gray translucent base */
-        rgba(36, 40, 59, 0.45);
-
-    /* Glass edge highlight (unchanged) */
-    border: 1px solid rgba(255, 255, 255, 0.15);
-
-    padding: 0 7px;
-    margin-top: 3px;
-    margin-bottom: 3px;
-    /* NEW: Text color is now white-ish over blue-infused base */
-    color: #ffffff;
+    background: rgba(0, 0, 0, 0.92);
+    border: 1px solid rgba(255, 255, 255, 0.03);
+    padding: 0 14px;
+    margin: 2px 0;
+    min-height: 32px;
+    color: #c0caf5;
     border-radius: 20px;
     font-weight: bold;
-    transition: all 0.2s ease;
+    transition: all 0.15s ease;
 }
 
 #workspaces {
-    padding: 7px 5px 7px 5px;
+    padding: 2px 8px;
 }
 
 #workspaces button {
-    margin-left: 2px;
-    margin-right: 1px;
-    padding: 0 6px;
+    margin: 0;
+    padding: 0 5px;
     background-color: transparent;
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    border-radius: 20px;
+    border: 1px solid rgba(122, 162, 247, 0.08);
+    border-radius: 16px;
     transition: all 0.3s ease-in-out;
+    min-width: 14px;
+    color: #565f89;
 }
 
 #workspaces button:hover {
-    background: rgba(0, 0, 0, 0.2);
+    background: rgba(255, 255, 255, 0.05);
     transition: all 0.3s ease-in-out;
 }
 
 #workspaces button.active {
-    min-width: 30px;
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    background-color: rgba(0, 48, 143, 0.19);
-    border-radius: 20px;
+    min-width: 28px;
+    border: 1px solid rgba(122, 162, 247, 0.3);
+    background-color: #1a1b26;
+    border-radius: 16px;
     transition: all 0.3s ease-in-out;
+    color: #7aa2f7;
 }
 
 #workspaces button.urgent {
-    color: #e67e8c;
+    color: #f7768e;
 }
 
 #custom-launcher {
-    /* Increase left padding to push it right */
-    padding-left: 10px;
-    padding-right: 14px;
-    /* If it's vertically uncentered, you can nudge it with:
-       padding-bottom: 2px; */
+    padding-left: 17px;
+    padding-right: 20px;
+    color: #bb9af7;
 }
+
 #custom-notification {
-    /* Same here, adjust until it looks right */
-    padding-left: 10px;
-    padding-right: 13px;
+    padding-left: 16px;
+    padding-right: 18px;
+    color: #7dcfff;
 }
+
 #pulseaudio {
-    padding-left: 12px;
-    padding-right: 12px;
+    padding-left: 18px;
+    padding-right: 18px;
+    color: #9ece6a;
+}
+
+#clock {
+    color: #e0af68;
+}
+
+#cpu {
+    color: #7aa2f7;
+}
+
+#memory {
+    color: #bb9af7;
+}
+
+#network {
+    color: #9ece6a;
+}
+
+#battery {
+    color: #7dcfff;
+}
+
+#window {
+    color: #a9b1d6;
 }

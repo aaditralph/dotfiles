@@ -1,111 +1,125 @@
+/*
+All modules or parts I would want:
+Left side:
+OS Icon for launcher
+CPU + done
+RAM Monitors done
+system tray done
+
+Center:
+Current window name
+Workspaces navigator and identifier done
+Clock done
+
+Right:
+Volume(Speaker Controls as well) done
+Wifi(+Bluetooth on click) done
+Battery done
+Notification
+
+*/
 {
-  "layer": "top",
-  "position": "top",
-  "margin-top": 10,
-  "margin-left": 10,
-  "margin-right": 10,
-  "spacing": 10,
-
-  "modules-left": ["custom/launcher", "custom/power"],
+  "height": 42, // Waybar height (to be removed for auto height)
+  "spacing": 8, // Gaps between modules (4px)
   "modules-center": ["hyprland/window", "hyprland/workspaces", "clock"],
-  "modules-right": [
-    "tray",
-    "pulseaudio",
-    "network",
-    "battery",
-    "custom/notification",
-  ],
-
-  "hyprland/workspaces": {
-    "format": "{name}",
-    "on-click": "activate",
-    "all-outputs": true,
-    "sort-by-number": true,
-  },
-
-  "clock": {
-    "format": "{:%I:%M %p}",
-    "tooltip-format": "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>",
-  },
-
-  "network": {
-    "format-wifi": "  {essid}",
-    "format-ethernet": "  {ipaddr}",
-    "format-disconnected": "  Off",
-    "tooltip-format": "{ifname}: {ipaddr}/{cidr}\n {bandwidthDownBits}\n {bandwidthUpBits}",
-    "on-click": "pkill -x rofi || ~/.config/waybar/scripts/network-menu.sh",
-    "interval": 5,
-  },
-  "bluetooth": {
-    "format": " {status}",
-    "format-connected": " {device_alias}",
-    "format-disabled": "",
-    "tooltip-format": "{controller_alias}\t{controller_address}",
-    "tooltip-format-connected": "{controller_alias}\t{controller_address}\n\n{device_enumerate}",
-    "tooltip-format-enumerate-connected": "{device_alias}\t{device_address}",
-    "on-click": "pkill -x rofi || rofi-bluetooth",
-    "on-click-right": "bluetoothctl power off",
-  },
-  "battery": {
-    "states": { "warning": 30, "critical": 15 },
-    "format": "<span letter_spacing='2000'>{icon}</span>{capacity}<span letter_spacing='5000'>%</span>",
-    "format-charging": " {capacity}%",
-    "format-plugged": " {capacity}%",
-    "format-icons": [" ", " ", " ", " ", " "],
-  },
-
-  "pulseaudio": {
-    "format": "  {volume}%",
-    "format-muted": " Muted",
-    "on-click": "pavucontrol",
-  },
-
-  "temperature": {
-    "critical-threshold": 80,
-    "format": " {temperatureC}°C",
-  },
-
+  "modules-left": ["custom/launcher", "cpu", "memory", "tray"],
+  "modules-right": ["pulseaudio", "network", "battery", "custom/notification"],
   "tray": {
-    "icon-size": 16,
+    "icon-size": 21,
     "spacing": 10,
   },
-
-  "custom/launcher": {
-    "format": "",
-    "on-click": "rofi -show drun",
+  "clock": {
+    // "timezone": "America/New_York",
+    "tooltip-format": "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>",
+    "format": "{:%I:%M %p}",
+  },
+  "cpu": {
+    "format": "{usage}% ",
+    "tooltip": false,
+  },
+  "memory": {
+    "format": "{}% ",
+  },
+  "battery": {
+    "states": {
+      // "good": 95,
+      "warning": 30,
+      "critical": 15,
+    },
+    "format": "{capacity}% {icon} ",
+    "format-charging": "{capacity}% 󰂄",
+    "format-plugged": "{capacity}% ",
+    // "format-good": "", // An empty format will hide the module
+    // "format-full": "",
+    "format-icons": ["", "", "", "", ""],
   },
 
+
+
+  "network": {
+    // "interface": "wlp2*", // (Optional) To force the use of this interface
+    "format-wifi": "{essid} ({signalStrength}%)  ",
+    "format-ethernet": "{ipaddr}/{cidr} ",
+    "format-linked": "{ifname} (No IP) ",
+    "format-disconnected": "Disconnected ⚠",
+    "on-click": "orbit toggle top-right",
+  },
+  "pulseaudio": {
+    // "scroll-step": 1, // %, can be a float
+    "format": "{volume}% {icon}",
+    "format-bluetooth": "{volume}% ",
+    "format-bluetooth-muted": "󰝟 ",
+    "format-muted": "󰝟",
+    "format-icons": {
+      "headphone": "",
+      "hands-free": "",
+      "headset": "",
+      "phone": "",
+      "portable": "",
+      "car": "",
+      "default": ["", "", ""],
+    },
+    "on-click": "pavucontrol",
+  },
+  "hyprland/window": {
+    "format": "{}",
+    "rewrite": {
+      "(.*) - Vivaldi": "Vivaldi",
+      "(.*) — Vivaldi": "Vivaldi",
+      "Vivaldi": "Vivaldi",
+      "(.*) - Alacritty": "Alacritty",
+      "Alacritty": "Alacritty",
+      "(.*) - Zed": "Zed",
+      "(.*) — Zed": "Zed",
+      "Zed": "Zed",
+      "(.*) - Goofcord": "Goofcord",
+      "Goofcord": "Goofcord",
+      "(.*) - Mozilla Firefox": "Firefox",
+      "(.*) — Mozilla Firefox": "Firefox",
+      "(.*) - (.*)": "$2",
+      "(.*) — (.*)": "$2",
+      "(.*) \\| (.*)": "$2",
+      "(.*)": " $1",
+    },
+    "icon": true,
+    "icon-size": 26,
+    "separate-outputs": true,
+  },
   "custom/notification": {
-    "format": "",
+    "format": "{icon}",
+    "format-icons": {
+      "default": "",
+    },
     "on-click": "swaync-client -t -sw",
   },
-
-  "custom/orbit": {
-    "exec": "orbit waybar-status",
-    "return-type": "json",
-    "interval": 10,
-    "on-click": "orbit toggle top-right",
-    "format": "󱗿",
-  },
-
-  "hyprland/window": {
-    "format": "<span font='9' rise='-4444'>{}</span>",
-    "max-length": 15,
-    "rewrite": {
-      "(.*) — Mozilla Firefox": "󰈹 $1",
-      "(.*) - Vivaldi": "󰖟 $1",
-      "(.*) — Zed": "󰰰 $1",
-      "(.*) - fish": "󰈺 [$1]",
-      // Capture a clean "Desktop" when no window is active
-      "^$": "󰇄 Desktop",
+  "custom/launcher": {
+    "format": "{icon}",
+    "format-icons": {
+      "default": "",
     },
-    "separate-outputs": true,
-    "icon": true,
-    "icon-size": 24,
+    "on-click": "rofi -show drun",
   },
-  "custom/power": {
-    "format": "󰐥",
-    "on-click": "~/.config/rofi/powermenu.sh",
-    "tooltip": false,
+  "hyprland/workspaces": {
+    "format": "{name}",
   },
 }
