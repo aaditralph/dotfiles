@@ -1,8 +1,40 @@
--- apply a 90° offset in rotate mode to the text shape
-hl.plugin.dynamic_cursors.shape_rule { shape = "text", rotate = { offset = 90.0 } }
+hl.config({
+    plugin = {
+        dynamic_cursors = {
+            enabled = true,
 
--- use stretch mode when grabbing, and set the limit low
-hl.plugin.dynamic_cursors.shape_rule { shape = "grab", mode = "stretch", stretch = { limit = 2000 } }
+            mode = "rotate",
+            threshold = 2,
 
--- do not show any effects on clientside cursors
-hl.plugin.dynamic_cursors.shape_rule { shape = "clientside", mode = "none" }
+            rotate = {
+                length = 22,
+                offset = -8,
+            },
+
+            stretch = {
+                limit = 1800,
+            },
+
+            shake = {
+                enabled = true,
+                threshold = 5,
+                base = 3,
+                speed = 4,
+                timeout = 1200,
+                effects = false,
+            },
+
+            hyprcursor = {
+                enabled = true,
+                nearest = false,
+            },
+
+            shaperule = {
+                "text, none",
+                "wait, none",
+                "grab, stretch, stretch:limit: 1800",
+                "grabbing, stretch, stretch:limit: 1800",
+            },
+        },
+    },
+})

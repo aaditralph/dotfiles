@@ -1,27 +1,27 @@
 hl.config({
-    general = {
-        layout = "scrolling",
-    }
+	general = {
+		layout = "scrolling",
+	},
 })
 
 -- See https://wiki.hypr.land/Configuring/Layouts/Dwindle-Layout/ for more
 hl.config({
-    scrolling = {
-        column_width = 0.85,
-        follow_focus = true
-    },
+	scrolling = {
+		column_width = 0.95,
+		follow_focus = true,
+	},
 })
 
 -- See https://wiki.hypr.land/Configuring/Layouts/Master-Layout/ for more
 hl.config({
-    master = {
-        new_status = "master",
-    },
+	master = {
+		new_status = "master",
+	},
 })
 
 -- See https://wiki.hypr.land/Configuring/Layouts/Scrolling-Layout/ for more
 hl.config({
-    scrolling = {
-        fullscreen_on_one_column = true,
-    },
+	scrolling = {
+		fullscreen_on_one_column = true,
+	},
 })

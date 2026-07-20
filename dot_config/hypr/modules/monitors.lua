@@ -4,14 +4,14 @@
 
 -- See https://wiki.hypr.land/Configuring/Basics/Monitors/
 hl.monitor({
-    output   = "",
-    mode     = "preferred",
-    position = "auto",
-    scale    = "1.0",
+	output = "",
+	mode = "preferred",
+	position = "auto",
+	scale = "1.0",
 })
 
 hl.config({
-    cursor = {
-        no_hardware_cursors = true
-    }
+	cursor = {
+		no_hardware_cursors = true,
+	},
 })
