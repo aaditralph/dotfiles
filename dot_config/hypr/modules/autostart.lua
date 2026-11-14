@@ -7,10 +7,10 @@
 -- Autostart necessary processes (like notifications daemons, status bars, etc.)
 hl.on("hyprland.start", function()
 	hl.exec_cmd("waybar")
-	hl.exec_cmd("hyprpolkitagent")
+	-- hyprpolkitagent.service is enabled for graphical-session.target.
 	hl.exec_cmd("/usr/lib/pam_kwallet_init")
 	hl.exec_cmd("kwalletd5")
-	hl.exec_cmd("rog-control-center")
+	hl.exec_cmd([[/usr/bin/bash "$HOME/.config/hypr/scripts/start-power-tray.sh"]])
 	hl.exec_cmd("dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP")
 	hl.exec_cmd("awww-daemon")
 	hl.exec_cmd("hyprpm reload -n")

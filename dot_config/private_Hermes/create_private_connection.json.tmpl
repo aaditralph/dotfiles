@@ -1,0 +1,16 @@
+{{- $url := env "HERMES_DESKTOP_REMOTE_URL" -}}
+{{ if $url -}}
+{
+  "mode": "remote",
+  "remote": {
+    "url": {{ $url | toJson }},
+    "authMode": "oauth"
+  },
+  "profiles": {}
+}
+{{ else -}}
+{
+  "mode": "local",
+  "profiles": {}
+}
+{{ end -}}

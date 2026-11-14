@@ -1,0 +1,50 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+unit=local-llm.service
+power_guard="$HOME/.local/share/local-llm/run-on-ac"
+if (( $# == 0 )); then
+    state=$(systemctl --user is-active "$unit" || true)
+    selection=$(printf '%s\n' Start Stop Status | rofi -dmenu -no-custom -i -p "Local LLM ($state)") || exit 0
+    [[ -n "$selection" ]] || exit 0
+    if result=$("$0" "${selection,,}" 2>&1); then
+        notify-send 'Local LLM' "$result"
+    else
+        zenity --error --title='Local LLM' --text="$result" --no-markup
+    fi
+    exit
+fi
+
+case "$1" in
+    start)
+        if ! "$power_guard" --check; then
+            echo 'Plug in the laptop to start the local GPU models.' >&2
+            exit 1
+        fi
+        systemctl --user start "$unit"
+        for ((attempt = 0; attempt < 40; attempt++)); do
+            if ! "$power_guard" --check; then
+                echo 'AC power disconnected. Plug in the laptop and try again.' >&2
+                exit 1
+            fi
+            if curl -fsS --noproxy 127.0.0.1 --max-time 1 http://127.0.0.1:18081/health >/dev/null 2>&1; then
+                echo 'Ready. The model loads on the first request.'
+                exit 0
+            fi
+            sleep 0.25
+        done
+        echo 'Server did not become ready. Check journalctl --user -u local-llm.service.' >&2
+        exit 1
+        ;;
+    stop)
+        systemctl --user stop "$unit"
+        echo 'Stopped. The loaded model has been released.'
+        ;;
+    status)
+        systemctl --user is-active "$unit" || true
+        ;;
+    *)
+        echo 'Usage: local-llm [start|stop|status]' >&2
+        exit 2
+        ;;
+esac

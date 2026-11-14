@@ -1,0 +1,16 @@
+{
+  "browser": {
+    "enable_spellchecking": true
+  },
+  "electron": {
+    "global_shortcuts": {
+      "uuid": "ddc881cd-b91c-421c-9cd5-c933f7a27c44"
+    }
+  },
+  "spellcheck": {
+    "dictionaries": [
+      "en-GB"
+    ],
+    "dictionary": ""
+  }
+}

@@ -1,0 +1,54 @@
+background {
+    monitor =
+    color = rgb(041928)
+    path = {{ .chezmoi.homeDir }}/Pictures/Wallpapers/DavidCyberpunk.png
+    blur_passes = 0
+}
+
+general {
+    hide_cursor = false
+    immediate_render = true
+}
+
+animations {
+    enabled = false
+}
+
+label {
+    monitor =
+    text = SESSION LOCKED
+    color = rgb(73e3d5)
+    font_family = Noto Sans SemiBold
+    font_size = 13
+    position = 6%, 112
+    halign = left
+    valign = center
+}
+
+label {
+    monitor =
+    text = $TIME
+    color = rgb(f2f8fa)
+    font_family = Noto Sans Light
+    font_size = 78
+    position = 6%, 42
+    halign = left
+    valign = center
+}
+
+input-field {
+    monitor =
+    size = 240, 46
+    position = 6%, -55
+    halign = left
+    valign = center
+    rounding = 10
+    outline_thickness = 2
+    outer_color = rgb(33ccff) rgb(00ff99) 45deg
+    inner_color = rgb(061b29)
+    font_color = rgb(f2f8fa)
+    font_family = Noto Sans
+    fail_color = rgb(ff818a)
+    fade_on_empty = false
+    placeholder_text = Enter password
+}

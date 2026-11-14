@@ -1,0 +1,9 @@
+README.md
+system-reference
+system-reference/**
+{{ if not (env "OPENCODE_SERVICE_PASSWORD") }}
+.config/opencode/service.json
+{{ end }}
+{{ if not (and (eq .chezmoi.os "linux") (env "DBUS_SESSION_BUS_ADDRESS") (lookPath "dconf")) }}
+gnome-desktop.sh
+{{ end }}

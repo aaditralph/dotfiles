@@ -1,0 +1,37 @@
+{{- $url := env "HERMES_DESKTOP_REMOTE_URL" -}}
+{{ if $url -}}
+{
+  "version": 2,
+  "primary": "remote",
+  "launchMode": "primary",
+  "lastUsed": "remote",
+  "connections": [
+    {
+      "id": "local",
+      "kind": "local",
+      "label": "This device"
+    },
+    {
+      "id": "remote",
+      "kind": "remote",
+      "label": "Hermes remote",
+      "url": {{ $url | toJson }},
+      "authMode": "oauth"
+    }
+  ]
+}
+{{ else -}}
+{
+  "version": 2,
+  "primary": "local",
+  "launchMode": "primary",
+  "lastUsed": "local",
+  "connections": [
+    {
+      "id": "local",
+      "kind": "local",
+      "label": "This device"
+    }
+  ]
+}
+{{ end -}}

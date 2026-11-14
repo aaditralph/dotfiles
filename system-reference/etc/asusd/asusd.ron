@@ -1,0 +1,59 @@
+(
+    charge_control_end_threshold: 70,
+    base_charge_control_end_threshold: 0,
+    disable_nvidia_powerd_on_battery: true,
+    ac_command: "",
+    bat_command: "",
+    platform_profile_linked_epp: true,
+    platform_profile_on_battery: Quiet,
+    change_platform_profile_on_battery: true,
+    platform_profile_on_ac: Performance,
+    change_platform_profile_on_ac: true,
+    profile_quiet_epp: Power,
+    profile_balanced_epp: BalancePower,
+    profile_custom_epp: Performance,
+    profile_performance_epp: Performance,
+    ac_profile_tunings: {
+        Quiet: (
+            enabled: true,
+            group: {
+                NvDynamicBoost: 25,
+                PptPl1Spl: 100,
+                PptPl2Sppt: 105,
+                NvTempTarget: 87,
+            },
+        ),
+        Performance: (
+            enabled: true,
+            group: {
+                NvTempTarget: 87,
+                PptPl2Sppt: 105,
+                PptPl1Spl: 90,
+                NvDynamicBoost: 25,
+            },
+        ),
+    },
+    dc_profile_tunings: {
+        Quiet: (
+            enabled: true,
+            group: {
+                NvDynamicBoost: 25,
+                NvTempTarget: 87,
+                PptPl1Spl: 30,
+                PptPl2Sppt: 35,
+            },
+        ),
+        Performance: (
+            enabled: true,
+            group: {
+                NvTempTarget: 87,
+                NvDynamicBoost: 0,
+                PptPl2Sppt: 60,
+                PptPl1Spl: 45,
+            },
+        ),
+    },
+    armoury_settings: {
+        PanelOverdrive: 1,
+    },
+)

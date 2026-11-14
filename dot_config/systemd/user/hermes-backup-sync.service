@@ -1,0 +1,8 @@
+[Unit]
+Description=Pull Hermes backup configuration from the Moto G6
+After=network-online.target
+
+[Service]
+Type=oneshot
+UMask=0077
+ExecStart=%h/.local/bin/hermes-backup sync

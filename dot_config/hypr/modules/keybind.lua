@@ -22,7 +22,7 @@ hl.bind(mainMod .. " + F", hl.dsp.window.fullscreen_state({ internal = 2, client
 
 -- Screenshots
 hl.bind(mainMod .. " + SHIFT + S", hl.dsp.exec_cmd("hyprshot -m region --clipboard-only"))
-
+hl.bind(mainMod .. " + SHIFT + P", hl.dsp.exec_cmd("hyprpicker"))
 -- Wallpaper switcher
 hl.bind(mainMod .. " + W", hl.dsp.exec_cmd(" ~/.config/rofi/scripts/wallpaper.sh"))
 
@@ -42,8 +42,8 @@ hl.bind(mainMod .. " + mouse:272", hl.dsp.window.drag(), { mouse = true })
 hl.bind(mainMod .. " + mouse:273", hl.dsp.window.resize(), { mouse = true })
 
 -- Scroll through windows in scrolling layout with mainMod + scroll
-hl.bind(mainMod .. " + mouse_down", hl.dsp.layout("move +col"))
-hl.bind(mainMod .. " + mouse_up", hl.dsp.layout("move -col"))
+hl.bind(mainMod .. " + mouse_down", hl.dsp.layout("move -col"))
+hl.bind(mainMod .. " + mouse_up", hl.dsp.layout("move +col"))
 
 -- Move focus with mainMod + arrow keys
 hl.bind(mainMod .. " + left", hl.dsp.focus({ direction = "left" }))

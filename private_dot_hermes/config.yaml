@@ -1,0 +1,5 @@
+desktop:
+  electron_flags:
+    - "--force-prefers-reduced-motion"
+  repo_scan_enabled: false
+  ozone_platform_hint: auto

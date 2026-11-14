@@ -1,0 +1,1 @@
+ACTION=="add|bind", SUBSYSTEM=="pci", DRIVER=="r8169", ATTR{vendor}=="0x10ec", ATTR{device}=="0x8168", ATTR{subsystem_vendor}=="0x1043", ATTR{subsystem_device}=="0x208f", TEST=="power/control", ATTR{power/control}="auto"

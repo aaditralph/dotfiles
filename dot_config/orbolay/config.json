@@ -1,0 +1,33 @@
+{
+  "overlayKeybind": [
+    "ControlLeft",
+    "BackQuote"
+  ],
+  "displayIdx": null,
+  "port": 6888,
+  "enableMessageNotifications": true,
+  "messageAlignment": null,
+  "userAlignment": null,
+  "messageOffsetX": 0,
+  "messageOffsetY": 0,
+  "userOffsetX": 0,
+  "userOffsetY": 0,
+  "displayVoiceMembers": "alwaysSemiTransparent",
+  "messagesSemitransparent": false,
+  "isKeybindEnabled": null,
+  "transportMode": "websocket",
+  "softwareRendering": null,
+  "xwayland": true,
+  "accent": [
+    30,
+    31,
+    35
+  ],
+  "textColor": [
+    255,
+    255,
+    255
+  ],
+  "borderRadius": 10.0,
+  "uiScale": 0.75
+}

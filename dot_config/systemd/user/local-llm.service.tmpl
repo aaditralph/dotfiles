@@ -1,0 +1,14 @@
+[Unit]
+Description=Local CUDA model server for coding agents
+
+[Service]
+Environment=LD_LIBRARY_PATH={{ .chezmoi.homeDir }}/.local/share/local-llm/runtime/cudart-llama-b12038-bin-ubuntu-cuda-12.8-x64
+Environment=LLAMA_CACHE={{ .chezmoi.homeDir }}/.local/share/local-llm/cache
+ExecCondition=%h/.local/share/local-llm/run-on-ac --check
+ExecStart=%h/.local/share/local-llm/run-on-ac {{ .chezmoi.homeDir }}/.local/share/local-llm/runtime/llama-b12038/llama-server --models-preset {{ .chezmoi.homeDir }}/.local/share/local-llm/models.ini --models-max 1 --models-autoload --host 127.0.0.1 --port 18081
+Restart=on-failure
+KillMode=mixed
+TimeoutStopSec=5s
+
+[Install]
+WantedBy=default.target

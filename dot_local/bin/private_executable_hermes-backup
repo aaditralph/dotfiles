@@ -1,0 +1,239 @@
+#!/opt/hermes-agent/venv/bin/python
+"""Sync the Moto G6 configuration and start an on-demand, laptop-local chat."""
+from contextlib import contextmanager, suppress
+import fcntl
+import os
+from pathlib import Path
+import shutil
+import signal
+import socket
+import sqlite3
+import subprocess
+import sys
+import tarfile
+import tempfile
+import time
+import urllib.error
+import urllib.request
+
+from dotenv import dotenv_values
+from ruamel.yaml import YAML
+
+ROOT = Path.home() / ".local/share/hermes-backup"
+CURRENT = ROOT / "current"
+AGENT = ROOT / "agent"
+VAULT = Path.home() / "Documents/Second Brain/Second Brain"
+PHONE_VAULT = "/home/user/Sync/Second Brain"
+HERMES = "/usr/bin/hermes"
+ROUTER = "http://127.0.0.1:20130"
+YAML_IO = YAML(typ="safe")
+PROFILE_FOLDERS = ("skills", "memories", "plugins", "hooks")
+
+
+def sync():
+    previous = CURRENT.resolve() if CURRENT.is_symlink() else None
+    stage = Path(tempfile.mkdtemp(prefix="snapshot-", dir=ROOT))
+    swap = ROOT / ".current-next"
+    try:
+        with (ROOT / "snapshot-phone.py").open("rb") as script, tempfile.TemporaryFile(dir=ROOT) as stream:
+            subprocess.run(
+                ["/usr/bin/ssh", "-o", "BatchMode=yes", "-o", "ConnectTimeout=8",
+                 "-o", "StrictHostKeyChecking=yes", "-o", "IdentityAgent=none",
+                 "-o", "ServerAliveInterval=10", "-o", "ServerAliveCountMax=2",
+                 "user@aaditg6", "python3", "-"],
+                stdin=script, stdout=stream, check=True, timeout=180,
+            )
+            stream.seek(0)
+            with tarfile.open(fileobj=stream, mode="r:gz") as archive:
+                if any(not (entry.isfile() or entry.isdir()) for entry in archive):
+                    raise ValueError("Unexpected file type in the phone snapshot")
+                archive.extractall(stage, filter="data")
+
+        profile = stage / "agent"
+        config = YAML_IO.load(profile / "config.yaml")
+        provider = config.get("providers", {}).get("9router", {})
+        if provider.get("api") != f"{ROUTER}/v1" or provider.get("key_env") != "NINEROUTER_API_KEY":
+            raise ValueError("The phone's 9router endpoint or key setting changed")
+        key = dotenv_values(profile / ".env", interpolate=False).get("NINEROUTER_API_KEY")
+        if not key or not dotenv_values(stage / "router.env", interpolate=False).get("ROUTER_MASTER_KEY"):
+            raise ValueError("The snapshot is missing a model-router credential")
+        with sqlite3.connect(stage / "router/data.sqlite") as db:
+            if db.execute("PRAGMA quick_check").fetchone() != ("ok",):
+                raise ValueError("The model-router snapshot did not pass its database check")
+            if not db.execute("SELECT 1 FROM apiKeys WHERE key=? AND isActive=1", (key,)).fetchone():
+                raise ValueError("The Hermes model-router key is absent or inactive")
+            db.execute("DELETE FROM apiKeys WHERE key IS NOT ?", (key,))
+            db.commit()
+            db.execute("VACUUM")
+
+        swap.unlink(missing_ok=True)
+        swap.symlink_to(stage.name)
+        os.replace(swap, CURRENT)
+    finally:
+        if CURRENT.resolve() != stage:
+            shutil.rmtree(stage)
+    if previous and previous.parent == ROOT and previous.name.startswith("snapshot-"):
+        shutil.rmtree(previous)
+    print("Phone configuration and model routing synced.")
+
+
+def prepare(snapshot):
+    source = snapshot / "agent"
+    AGENT.mkdir(exist_ok=True, mode=0o700)
+    config = YAML_IO.load(source / "config.yaml")
+    # The phone's dispatcher and public address have no role in a laptop chat.
+    config.pop("platforms", None)
+    config.pop("dashboard", None)
+    config.setdefault("webapp", {})["enabled"] = False
+    config["gateway"].update(multiplex_profiles=False, auto_multiplex_migration=False, profile_routes=[])
+    config.setdefault("cron", {})["catch_up_missed"] = False
+    with (AGENT / "config.yaml").open("w") as file:
+        YAML_IO.dump(config, file)
+
+    phone_env = dotenv_values(source / ".env", interpolate=False)
+    # Keep only the model key and tool settings in the terminal runtime.
+    keys = {
+        "NINEROUTER_API_KEY", "BROWSER_INACTIVITY_TIMEOUT", "BROWSER_SESSION_TIMEOUT",
+        "TERMINAL_LIFETIME_SECONDS", "TERMINAL_TIMEOUT",
+    }
+    with (AGENT / ".env").open("w") as file:
+        for name in sorted(keys & phone_env.keys()):
+            value = phone_env[name]
+            if value is not None:
+                quoted = value.replace("\\", "\\\\").replace("'", "\\'")
+                file.write(f"{name}='{quoted}'\n")
+        file.write(f"OBSIDIAN_VAULT_PATH=\"{VAULT}\"\n")
+    (AGENT / "SOUL.md").write_text((source / "SOUL.md").read_text().replace(PHONE_VAULT, str(VAULT)))
+    for name in PROFILE_FOLDERS:
+        destination = AGENT / name
+        if destination.exists():
+            shutil.rmtree(destination)
+        if (source / name).is_dir():
+            shutil.copytree(source / name, destination)
+
+
+@contextmanager
+def child(command, environment, log):
+    with log.open("w") as output:
+        process = subprocess.Popen(
+            command, env=environment, stdin=subprocess.DEVNULL,
+            stdout=output, stderr=subprocess.STDOUT, start_new_session=True,
+        )
+    try:
+        yield process
+    finally:
+        if process.poll() is None:
+            with suppress(ProcessLookupError):
+                os.killpg(process.pid, signal.SIGTERM)
+            try:
+                process.wait(timeout=12)
+            except subprocess.TimeoutExpired:
+                with suppress(ProcessLookupError):
+                    os.killpg(process.pid, signal.SIGKILL)
+                process.wait()
+
+
+def wait_ready(process, probe, label, log):
+    deadline = time.monotonic() + 30
+    while time.monotonic() < deadline and process.poll() is None:
+        if probe():
+            return
+        time.sleep(0.2)
+    raise RuntimeError(f"{label} did not become ready. See {log}.")
+
+
+def chat(arguments):
+    if not CURRENT.is_dir():
+        raise RuntimeError("No phone snapshot. Run hermes-backup sync while the phone is reachable.")
+    snapshot = CURRENT.resolve()
+    prepare(snapshot)
+    environment = {
+        name: value for name, value in os.environ.items()
+        if name.startswith("LC_") or name in {
+            "HOME", "USER", "LOGNAME", "PATH", "SHELL", "LANG", "TERM", "COLORTERM",
+            "XDG_RUNTIME_DIR", "SSH_AUTH_SOCK", "DBUS_SESSION_BUS_ADDRESS",
+            "DISPLAY", "WAYLAND_DISPLAY", "XAUTHORITY",
+        }
+    }
+    environment["HERMES_HOME"] = str(AGENT)
+    with socket.socket() as port_check:
+        port_check.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        port_check.bind(("127.0.0.1", 20130))
+    http = urllib.request.build_opener(urllib.request.ProxyHandler({}))
+
+    def router_ready():
+        try:
+            with http.open(f"{ROUTER}/health", timeout=1) as response:
+                return response.status == 200
+        except (OSError, urllib.error.URLError):
+            return False
+
+    def gateway_ready():
+        try:
+            with socket.socket(socket.AF_UNIX) as client:
+                client.settimeout(0.2)
+                client.connect(str(AGENT / "gateway.sock"))
+            return True
+        except OSError:
+            return False
+
+    with tempfile.TemporaryDirectory(prefix="router-run-", dir=ROOT) as router_run:
+        data = Path(router_run)
+        (data / "db").mkdir()
+        shutil.copyfile(snapshot / "router/data.sqlite", data / "db/data.sqlite")
+        if (snapshot / "router/machine-id").is_file():
+            shutil.copyfile(snapshot / "router/machine-id", data / "machine-id")
+        settings = dotenv_values(snapshot / "router.env", interpolate=False)
+        router_env = {
+            **environment, "HOST": "127.0.0.1", "PORT": "20130", "DATA_DIR": str(data),
+            "ROUTER_MASTER_KEY": settings["ROUTER_MASTER_KEY"], "STRICT_SSL": "true",
+            "AUTO_UPDATE": "false", "GEMINI_WEB_ROTATION": "off",
+        }
+        router_log = ROOT / "router.log"
+        gateway_log = ROOT / "gateway.log"
+        with child([ROOT / "9router-go"], router_env, router_log) as router:
+            wait_ready(router, router_ready, "Local 9router", router_log)
+            with child([HERMES, "gateway", "run", "--external-supervisor"], environment, gateway_log) as gateway:
+                wait_ready(gateway, gateway_ready, "Local Hermes", gateway_log)
+                return subprocess.run([HERMES, "chat", "--cli", *arguments], env=environment).returncode
+
+
+def main():
+    os.umask(0o077)
+    action, *arguments = sys.argv[1:] or ["chat"]
+    if action not in ("chat", "sync", "status") or (action != "chat" and arguments):
+        raise ValueError("Usage: hermes-backup [chat [Hermes chat options] | sync | status]")
+    with (ROOT / "operation.lock").open("a") as lock:
+        try:
+            fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        except BlockingIOError:
+            if action == "sync":
+                print("Sync skipped because the backup is busy. The timer will try again.")
+                return 0
+            raise RuntimeError("The backup is currently syncing or running a chat.")
+        if action == "sync":
+            sync()
+        elif action == "status":
+            if not CURRENT.is_dir():
+                raise RuntimeError("No successful configuration sync yet.")
+            timestamp = time.strftime("%Y-%m-%d %H:%M %Z", time.localtime(CURRENT.lstat().st_mtime))
+            print(f"Last successful sync: {timestamp}")
+        else:
+            return chat(arguments)
+    return 0
+
+
+def exit_on_signal(signum, _frame):
+    raise SystemExit(128 + signum)
+
+
+if __name__ == "__main__":
+    signal.signal(signal.SIGHUP, exit_on_signal)
+    signal.signal(signal.SIGTERM, exit_on_signal)
+    try:
+        sys.exit(main())
+    except KeyboardInterrupt:
+        sys.exit(130)
+    except (OSError, RuntimeError, ValueError, subprocess.SubprocessError, tarfile.TarError) as error:
+        print(f"hermes-backup: {error}", file=sys.stderr)
+        sys.exit(1)

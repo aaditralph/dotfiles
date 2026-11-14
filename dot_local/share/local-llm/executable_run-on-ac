@@ -1,0 +1,45 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+on_ac() {
+    local online
+    [[ -r /sys/class/power_supply/ADP0/online ]] &&
+        IFS= read -r online < /sys/class/power_supply/ADP0/online &&
+        [[ $online == 1 ]]
+}
+
+if [[ ${1-} == --check ]]; then
+    on_ac
+    exit
+fi
+
+if ! on_ac; then
+    echo 'Local LLM is waiting for AC power.' >&2
+    exit 0
+fi
+
+"$@" &
+server=$!
+stop_server() {
+    kill "$server" 2>/dev/null || return 0
+    for ((attempt = 0; attempt < 30; attempt++)); do
+        if ! kill -0 "$server" 2>/dev/null; then
+            wait "$server" 2>/dev/null || true
+            return 0
+        fi
+        sleep 0.1
+    done
+}
+trap stop_server EXIT
+trap 'exit 0' INT TERM
+
+while kill -0 "$server" 2>/dev/null; do
+    if ! on_ac; then
+        echo 'AC power disconnected. Stopping local LLM and releasing the GPU.' >&2
+        exit 0
+    fi
+    sleep 1
+done
+
+trap - EXIT
+wait "$server"

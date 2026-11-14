@@ -1,0 +1,2 @@
+ACTION=="add|change", SUBSYSTEM=="drm", KERNEL=="card[0-9]*", ATTRS{vendor}=="0x8086", ATTRS{device}=="0xa7a8", SYMLINK+="dri/intel_card"
+ACTION=="add|change", SUBSYSTEM=="drm", KERNEL=="card[0-9]*", ATTRS{vendor}=="0x10de", ATTRS{device}=="0x28e0", SYMLINK+="dri/nvidia_card"
